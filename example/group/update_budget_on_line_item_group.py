@@ -39,7 +39,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--environment",
         type=str,
-        help="The environment to use. One of: production, edge, or staging",
+        help="The environment to use. Either `production` or `staging`.",
     )
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
