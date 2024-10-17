@@ -265,7 +265,6 @@ class PlacementsIO:
     def __init__(self, environment: str = "staging", token: str = None):
         environments = {
             "production": "https://api.placements.io/v1/",
-            "edge": "https://edge-api.placements.io/v1/",
             "staging": "https://api-staging.placements.io/v1/",
         }
         self.base_url = environments[environment]

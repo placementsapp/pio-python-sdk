@@ -21,7 +21,6 @@ pio = PlacementsIO(environment="staging")
 
 The default environment if not provided is "staging". Possible values:
 - production
-- edge
 - staging
 
 ### Secrets
@@ -35,7 +34,6 @@ Environment variable names prioritize specific environments over the generic `PL
 
 Possible environment variables:
 - PLACEMENTS_IO_API_TOKEN_PRODUCTION
-- PLACEMENTS_IO_API_TOKEN_EDGE
 - PLACEMENTS_IO_API_TOKEN_STAGING
 - PLACEMENTS_IO_API_TOKEN
 
