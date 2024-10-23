@@ -1,41 +1,61 @@
-import os
-import httpx
+"""
+Placements.io API client library
+Low level code to interact with the Placements.io API
+"""
+
 import logging
 import asyncio
 import json
-from typing import Unpack, Union
-from pio._model import *
+from typing import Union
+import httpx
+from pio.error.api_error import APIError
+from pio.utility.json_encoder import JSONEncoder
 
-# TODO: look into HTTPX transports for handling 429 errors - https://www.python-httpx.org/advanced/transports/#http-transport
-
-
-class APIError(Exception):
-    pass
-
-
-class JSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        return super().default(obj)
+# TODO: look into HTTPX transports for handling 429 errors
+#   https://www.python-httpx.org/advanced/transports/#http-transport
 
 
 class PlacementsIOClient:
+    """
+    Placements.io API client library
+    Low level code to interact with the Placements.io API
+    """
 
     def __init__(self):
         self.logger = logging.getLogger("pio")
+        self.base_url = None
+        self.token = None
+
+    @property
+    def _version(self):
+        """
+        Returns the version of the client library
+        Note: This is locally imported to avoid circular imports
+        """
+        from pio import __version__  # pylint: disable=import-outside-toplevel
+
+        return __version__
 
     def pagination(self, page_number: int = 1) -> dict:
+        """
+        Provides pagination parameters for the API request.
+        """
         return {
             "page[number]": page_number,
-            "page[size]": 10,
+            "page[size]": 100,
         }
 
     def headers(self) -> dict:
+        """
+        Returns standardized headers for the API request.
+        """
+        token = self.token
+        if callable(self.token):
+            token = self.token()
         return {
-            "Authorization": f"Bearer {self.token}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/vnd.api+json",
-            "User-Agent": f"PlacementsIO Python Client/{os.environ["PLACEMENTS_IO_CLIENT_VERSION"]}",
+            "User-Agent": f"PlacementsIO Python Client/{self._version}",
             "x-metadata": json.dumps({"release": "alpha"}),
         }
 
@@ -43,9 +63,12 @@ class PlacementsIOClient:
         self,
         service: str,
         param: dict = None,
-        filter: dict = None,
-        include: list = None,
+        filters: dict = None,
+        includes: list = None,
     ) -> list:
+        """
+        Get existing resources within the service
+        """
         # TODO: Need to have a way to call multiple IDs at the same time
         async with httpx.AsyncClient(base_url=self.base_url, timeout=60) as client:
 
@@ -58,9 +81,9 @@ class PlacementsIOClient:
 
             param = param or {}
             param.update(self.pagination())
-            param.update(self._filter_values(filter))
-            param.update(self._include_values(include))
-            self.logger.info(f"Fetching data from {service}")
+            param.update(self._filter_values(filters))
+            param.update(self._include_values(includes))
+            self.logger.info("Fetching data from %s", service)
             response = await make_request(service, param)
             data = response.json()
             self.logger.debug(json.dumps(data, indent=4, default=str, cls=JSONEncoder))
@@ -71,7 +94,9 @@ class PlacementsIOClient:
             meta = data.get("meta", {})
             page_count = meta.get("page-count", 0)
             if page_count > 1:
-                self.logger.info(f"Paginating data from {service} [{page_count} Pages]")
+                self.logger.info(
+                    "Paginating data from %s [%s Pages]", service, page_count
+                )
 
             tasks = []
             for page_number in range(2, page_count + 1):
@@ -95,6 +120,9 @@ class PlacementsIOClient:
         attributes: Union[callable, dict] = None,
         relationships: Union[callable, dict] = None,
     ) -> dict:
+        """
+        Update existing resources within the service
+        """
         if not attributes and not relationships:
             raise ValueError(
                 "Must provide either attributes or relationships to update."
@@ -135,7 +163,8 @@ class PlacementsIOClient:
                             }
                         }
                         self.logger.info(
-                            f"Updating {url}",
+                            "Updating %s with payload: %s",
+                            url,
                             json.dumps(payload, indent=4, default=str, cls=JSONEncoder),
                         )
                         tasks.append(
@@ -151,13 +180,12 @@ class PlacementsIOClient:
             retry_after = 60
             responses_dict = {}
             while resource_ids:
-                # self.logger.info(resource_ids)
                 if attempts:
                     self.logger.warning(
-                        f"{len(resource_ids)} Resource IDs remaining..."
+                        "%s Resource IDs remaining...", len(resource_ids)
                     )
                     self.logger.warning(
-                        f"Waiting {retry_after} seconds before retrying..."
+                        "Waiting %s seconds before retrying...", retry_after
                     )
                     await asyncio.sleep(retry_after)
                 responses = await make_request(resource_ids)
@@ -185,14 +213,11 @@ class PlacementsIOClient:
         service: str,
         objects: list[dict],
     ) -> dict:
+        """
+        Create new resources within the service
+        """
 
         async def get_responses(objects: list) -> list:
-
-            class JSONEncoder(json.JSONEncoder):
-                def default(self, obj):
-                    if isinstance(obj, datetime):
-                        return obj.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-                    return super().default(obj)
 
             async def make_request(objects) -> list:
                 async with httpx.AsyncClient(
@@ -233,9 +258,9 @@ class PlacementsIOClient:
             while len(objects) != len(responses_final):
                 self.logger.info(objects)
                 if attempts:
-                    self.logger.warning(f"{len(objects)} Resources remaining...")
+                    self.logger.warning("%s Resources remaining...", len(objects))
                     self.logger.warning(
-                        f"Waiting {retry_after} seconds before retrying..."
+                        "Waiting %s seconds before retrying...", retry_after
                     )
                     await asyncio.sleep(retry_after)
                 responses = await make_request(objects)
@@ -259,168 +284,3 @@ class PlacementsIOClient:
 
     def _include_values(self, relationships: dict = None) -> str:
         return {"include": _ for _ in relationships or []}
-
-
-class PlacementsIO:
-    def __init__(self, environment: str = "staging", token: str = None):
-        environments = {
-            "production": "https://api.placements.io/v1/",
-            "staging": "https://api-staging.placements.io/v1/",
-        }
-        self.base_url = environments[environment]
-        self.token = (
-            token
-            or os.getenv(f"PLACEMENTS_IO_API_TOKEN_{environment.upper()}")
-            or os.getenv(f"PLACEMENTS_IO_API_TOKEN")
-        )
-        self.logger = logging.getLogger("pio")
-        self.settings = {
-            "base_url": self.base_url,
-            "token": self.token,
-        }
-
-    def relationship(self, relationship_url: str):
-        return self.Service(
-            **{
-                "base_url": self.base_url,
-                "token": self.token,
-                "base_url": self.base_url,
-                "service": relationship_url.replace(self.base_url, ""),
-                "model": {"get": ModelFilterDefaults},
-            }
-        )
-
-    class Service(PlacementsIOClient):
-        def __init__(self, token, base_url, service, model, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.token = token
-            self.base_url = base_url
-            self.service = service
-            self.model = model
-
-        async def get(
-            self, include: list = None, **args: Unpack[ModelFilterAccount]
-        ) -> list:
-            return await self.client(service=self.service, include=include, filter=args)
-
-        async def update(
-            self,
-            resource_ids: list,
-            attributes: Union[callable, dict] = None,
-            relationships: Union[callable, dict] = None,
-        ) -> dict:
-            return await self.client_update(
-                service=self.service,
-                resource_ids=resource_ids,
-                attributes=attributes,
-                relationships=relationships,
-            )
-
-        async def create(
-            self,
-            objects: list[dict],
-        ) -> dict:
-            return await self.client_create(
-                service=self.service,
-                objects=objects,
-            )
-
-    @property
-    def accounts(self) -> Service:
-        return self.Service(
-            **self.settings, service="accounts", model={"get": ModelFilterAccount}
-        )
-
-    @property
-    def campaigns(self) -> Service:
-        return self.Service(
-            **self.settings, service="campaigns", model={"get": ModelFilterCampaign}
-        )
-
-    @property
-    def contacts(self) -> Service:
-        return self.Service(
-            **self.settings, service="contacts", model={"get": ModelFilterContact}
-        )
-
-    @property
-    def creatives(self) -> Service:
-        return self.Service(
-            **self.settings, service="creatives", model={"get": ModelFilterCreative}
-        )
-
-    @property
-    def custom_fields(self) -> Service:
-        return self.Service(
-            **self.settings,
-            service="custom_fields",
-            model={"get": ModelFilterCustomField},
-        )
-
-    @property
-    def groups(self) -> Service:
-        return self.Service(
-            **self.settings, service="groups", model={"get": ModelFilterGroup}
-        )
-
-    @property
-    def line_items(self) -> Service:
-        return self.Service(
-            **self.settings, service="line_items", model={"get": ModelFilterLineItem}
-        )
-
-    @property
-    def opportunities(self) -> Service:
-        return self.Service(
-            **self.settings,
-            service="opportunities",
-            model={"get": ModelFilterOpportunity},
-        )
-
-    @property
-    def opportunity_line_items(self) -> Service:
-        return self.Service(
-            **self.settings,
-            service="opportunity_line_items",
-            model={"get": ModelFilterOpportunityLineItem},
-        )
-
-    @property
-    def packages(self) -> Service:
-        return self.Service(
-            **self.settings, service="packages", model={"get": ModelFilterPackage}
-        )
-
-    @property
-    def products(self) -> Service:
-        return self.Service(
-            **self.settings, service="products", model={"get": ModelFilterProduct}
-        )
-
-    @property
-    def product_rates(self) -> Service:
-        return self.Service(
-            **self.settings,
-            service="product_rates",
-            model={"get": ModelFilterProductRate},
-        )
-
-    @property
-    def rate_cards(self) -> Service:
-        return self.Service(
-            **self.settings,
-            service="rate_cards",
-            model={"get": ModelFilterRateCard},
-        )
-
-    @property
-    def reports(self) -> Service:
-        return self.Service(
-            **self.settings, service="reports", model={"get": ModelFilterReport}
-        )
-
-    @property
-    def users(self) -> Service:
-        return self.Service(
-            **self.settings, service="users", model={"get": ModelFilterUser}
-        )

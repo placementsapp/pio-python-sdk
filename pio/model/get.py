@@ -1,16 +1,27 @@
-from typing import TypedDict, Unpack
+"""
+Models for the GET API Endpoints
+"""
+
+from typing import TypedDict
 from datetime import datetime
 
 
 class ModelFilterDefaults(TypedDict):
+    """
+    Default API Filters that exist for all services
+    """
+
     id: int
     modified_since: datetime
     name: str
     uid: str
-    org_id: int
 
 
 class ModelFilterAccount(ModelFilterDefaults):
+    """
+    API Filters for Accounts
+    """
+
     account_type: str
     external_id: str
     archived: bool
@@ -19,6 +30,10 @@ class ModelFilterAccount(ModelFilterDefaults):
 
 
 class ModelFilterCampaign(ModelFilterDefaults):
+    """
+    API Filters for Campaigns
+    """
+
     ad_server_network_code: int
     ad_server_id: int
     archived: bool
@@ -26,24 +41,38 @@ class ModelFilterCampaign(ModelFilterDefaults):
 
 
 class ModelFilterContact(ModelFilterDefaults):
-    pass
+    """
+    API Filters for Contacts
+    """
 
 
 class ModelFilterCreative(ModelFilterDefaults):
-    pass
+    """
+    API Filters for Creatives
+    """
 
 
 class ModelFilterCustomField(ModelFilterDefaults):
-    pass
+    """
+    API Filters for Custom Fields
+    """
 
 
 class ModelFilterGroup(ModelFilterDefaults):
+    """
+    API Filters for Groups
+    """
+
     ad_server_network_code: int
     ad_server_id: int
     campagign: int
 
 
 class ModelFilterLineItem(ModelFilterDefaults):
+    """
+    API Filters for Line Items
+    """
+
     ad_server_network_code: int
     archived: bool
     approval_status: str
@@ -58,11 +87,19 @@ class ModelFilterLineItem(ModelFilterDefaults):
 
 
 class ModelFilterOpportunity(ModelFilterDefaults):
+    """
+    API Filters for Opportunities
+    """
+
     archived: bool
     opportunity_order_number: int
 
 
 class ModelFilterOpportunityLineItem(ModelFilterDefaults):
+    """
+    API Filters for Opportunity Line Items
+    """
+
     ad_server_network_code: int
     archived: bool
     started_before: datetime
@@ -73,11 +110,19 @@ class ModelFilterOpportunityLineItem(ModelFilterDefaults):
 
 
 class ModelFilterPackage(ModelFilterDefaults):
+    """
+    API Filters for Packages
+    """
+
     active: bool
     archived: bool
 
 
 class ModelFilterProduct(ModelFilterDefaults):
+    """
+    API Filters for Products
+    """
+
     ad_server: str
     ad_server_network_code: int
     active: bool
@@ -85,16 +130,26 @@ class ModelFilterProduct(ModelFilterDefaults):
 
 
 class ModelFilterProductRate(ModelFilterDefaults):
-    pass
+    """
+    API Filters for Product Rates
+    """
 
 
 class ModelFilterRateCard(ModelFilterDefaults):
-    pass
+    """
+    API Filters for Rate Cards
+    """
 
 
 class ModelFilterReport(ModelFilterDefaults):
-    pass
+    """
+    API Filters for Reports
+    """
 
 
 class ModelFilterUser(ModelFilterDefaults):
+    """
+    API Filters for Users
+    """
+
     email: str
