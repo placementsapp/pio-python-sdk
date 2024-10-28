@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "id": "2",
+      "type": "users",
+      "links": {
+        "self": "https://api.placements.io/v1/users/2"
+      },
+      "attributes": {
+        "active": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "data": [
+    {
+      "id": "52",
+      "type": "opportunities",
+      "links": {
+        "self": "https://api.placements.io/v1/opportunities/52"
+      },
+      "attributes": {
+        "name": "Amazon Fresh Campaign - Fall 2015",
+
+        "trafficker-info": {
+          "email": "russ.wilson_2000@example.org"
+        },
+        "sales-planner-info": {
+          "email": "2005_arlo_lebsack@example.net"
+        },
+        "primary-salesperson-info": {
+          "email": "1979_greenholt_melody@example.org",
+          "split-percent": 80
+        },
+        "secondary-salespeople-info": [
+          {
+            "email": "dewitt.stoltenberg.2016@example.com",
+            "split-percent": 20
+          }
+        ],
+        "ad-server-info": [
+          {
+            "ad-server": "dfp",
+            "ad-server-id": 20227938,
+            "ad-server-network-code": "88650439"
+          }
+        ]
+      },
+      "relationships": {
+        "advertiser": {
+          "links": {
+            "self": "https://api.placements.io/v1/opportunities/52/relationships/advertiser",
+            "related": "https://api.placements.io/v1/opportunities/52/advertiser"
+          },
+          "data": {
+            "type": "accounts",
+            "id": "3549"
+          }
+        }
+      }
+    }
+  ]
+}

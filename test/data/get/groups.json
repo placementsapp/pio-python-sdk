@@ -1,0 +1,54 @@
+{
+  "data": [
+    {
+      "id": "338",
+      "type": "groups",
+      "links": {
+        "self": "https://api.placements.io/v1/groups/338"
+      },
+      "attributes": {
+        "last-modified": "2023-08-30T23:14:59.115Z",
+        "ad-server-network-code": "88650439",
+        "custom-fields": null,
+        "active": true,
+        "archived": null,
+        "ad-server": null,
+        "ad-server-id": null,
+        "bill-by-bundle": null,
+        "billable": null,
+        "billing-cap": null,
+        "billing-schedule": null,
+        "billing-source": null,
+        "budget": "55552.50",
+        "contracted-units": 12345,
+        "cost-basis": "CPC",
+        "cost-per-unit": "4.50",
+        "currency-code": "USD",
+        "description": null,
+        "end-date": "2022-09-09T06:59:59.999Z",
+        "name": "renamed label, does it still show the product name here? (2)",
+        "pricing-budget-type": "PRICING_BUDGET_TYPE_REVENUE",
+        "start-date": "2022-08-31T07:00:00.000Z",
+        "time-zone": "Pacific Time (US & Canada)"
+      },
+      "relationships": {
+        "campaign": {
+          "links": {
+            "self": "https://api.placements.io/v1/groups/338/relationships/campaign",
+            "related": "https://api.placements.io/v1/groups/338/campaign"
+          },
+          "data": {
+            "type": "campaigns",
+            "id": "4994"
+          }
+        },
+        "line-items": {
+          "links": {
+            "self": "https://api.placements.io/v1/groups/338/relationships/line_items",
+            "related": "https://api.placements.io/v1/groups/338/line_items"
+          }
+        }
+      }
+    }
+  ]
+}

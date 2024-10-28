@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "id": "2",
+      "type": "products",
+      "links": {
+        "self": "https://api.placements.io/v1/products/2"
+      },
+      "attributes": {
+        "name": "test product"
+      }
+    }
+  ]
+}

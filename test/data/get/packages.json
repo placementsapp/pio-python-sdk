@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": "2",
+      "type": "packages",
+      "links": {
+        "self": "https://api.placements.io/v1/packages/2"
+      },
+      "attributes": {
+        "name": "test package",
+        "currency-code": "USD",
+        "active": true,
+        "archived": false,
+        "price": 0,
+        "pricing-mode": "PRICING_MODE_PERCENTAGE_BASED",
+        "lock-percent-allocation": true,
+        "pricing-floor": null,
+        "pricing-ceiling": null,
+        "billable": true,
+        "billing-source": "first_party_actuals",
+        "billing-schedule": "straightline",
+        "billing-cap": "no_cap",
+        "pricing-budget-type": "PRICING_BUDGET_TYPE_IMPRESSIONS",
+        "pricing-units": 1234567,
+        "cost-per-unit": 0,
+        "cost-basis": "CPM",
+        "units": null
+      }
+    }
+  ]
+}

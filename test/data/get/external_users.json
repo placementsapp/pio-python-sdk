@@ -1,0 +1,30 @@
+{
+  "data": [
+    {
+      "id": "8",
+      "type": "external-users",
+      "attributes": {
+        "last-modified": "2023-09-23T01:46:52.824Z",
+        "ad-server-info": [
+          {
+            "ad-server": "dfp",
+            "ad-server-id": 123990000,
+            "ad-server-network-code": "88650439"
+          }
+        ],
+        "email": "you@example.com",
+        "first-name": "Cecile",
+        "last-name": "Auer",
+        "uid": "425351c6cd85df"
+      },
+      "relationships": {
+        "user": {
+          "data": {
+            "type": "users",
+            "id": "47"
+          }
+        }
+      }
+    }
+  ]
+}

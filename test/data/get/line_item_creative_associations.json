@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "id": "10",
+      "type": "line-item-creative-associations",
+      "attributes": {
+        "last-modified": "2024-05-09T01:41:10.756Z",
+        "status": "ACTIVE",
+        "creative-ad-server-id": "998855"
+      },
+      "relationships": {
+        "line-item": {
+          "data": {
+            "type": "line-items",
+            "id": "1180"
+          }
+        }
+      }
+    }
+  ]
+}

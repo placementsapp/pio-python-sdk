@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "type": "reports",
+      "attributes": {
+        "definition": {
+          "start-date": "2020-08-10",
+          "end-date": "2020-08-20",
+          "columns": ["first_party_impressions"]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "data": [
+    {
+      "id": "106",
+      "type": "line-items",
+      "links": {
+        "self": "https://api.placements.io/v1/line_items/106"
+      },
+      "attributes": {
+        "name": "Line item 1",
+        "delivery-stats": {
+          "first-party": {
+            "clicks": 724,
+            "impressions": 94162670,
+            "viewable-impressions": 81683683
+          },
+          "third-party": {
+            "advertiser": "ACME Industries",
+            "server": "ImpSlinger",
+            "clicks": 956,
+            "impressions": 95318149,
+            "viewable-impressions": 79151545
+          }
+        },
+        "relationships": {
+          "campaign": {
+            "links": {
+              "self": "https://api.placements.io/v1/line_items/106/relationships/campaign",
+              "related": "https://api.placements.io/v1/line_items/106/campaign"
+            },
+            "data": {
+              "type": "campaigns",
+              "id": "41"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

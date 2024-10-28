@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "id": "7",
+      "type": "creatives",
+      "links": {
+        "self": "https://api.placements.io/v1/creatives/7"
+      },
+      "attributes": {
+        "last-modified": "2024-05-09T01:08:09.462Z",
+        "ad-server-network-code": "12345678",
+        "name": "test apn creative c3",
+        "ad-server": "app_nexus",
+        "ad-server-id": "998855",
+        "creative-type": "standard",
+        "status": "ACTIVE",
+        "width": null,
+        "height": null,
+        "click-target": null,
+        "media-url": null
+      },
+      "relationships": {
+        "account": {
+          "links": {
+            "self": "https://api.placements.io/v1/creatives/7/relationships/account",
+            "related": "https://api.placements.io/v1/creatives/7/account"
+          },
+          "data": {
+            "type": "accounts",
+            "id": "2"
+          }
+        }
+      }
+    }
+  ]
+}

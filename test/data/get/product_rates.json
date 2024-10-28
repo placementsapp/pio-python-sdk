@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "2",
+      "type": "product-rates",
+      "links": {
+        "self": "https://api.placements.io/v1/product_rates/2"
+      },
+      "attributes": {
+        "cost-per-unit": "1.00"
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "1"
+          }
+        },
+        "rate-card": {
+          "data": {
+            "type": "rate-cards",
+            "id": "1"
+          }
+        }
+      }
+    }
+  ]
+}

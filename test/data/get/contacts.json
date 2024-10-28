@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "1337",
+      "type": "contacts",
+      "links": {
+        "self": "https://api.placements.io/v1/contacts/1337"
+      },
+      "attributes": {
+        "first-name": "Jon",
+        "last-name": "Snow",
+        "email": "jon+snow@placements.io"
+      },
+      "relationships": {
+        "account": {
+          "links": {
+            "self": "https://api.placements.io/v1/contacts/1337/relationships/account",
+            "related": "https://api.placements.io/v1/contacts/1337/account"
+          },
+          "data": {
+            "type": "accounts",
+            "id": "80085"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "errors": [{ "status": 400, "title": "Testing", "detail": "This is a test" }]
+}

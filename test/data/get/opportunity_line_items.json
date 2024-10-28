@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "id": "67",
+      "type": "opportunity-line-items",
+      "links": {
+        "self": "https://api.placements.io/v1/opportunity_line_items/67"
+      },
+      "attributes": {
+        "name": "Opportunity Line item 1"
+      },
+      "relationships": {
+        "opportunity": {
+          "links": {
+            "self": "https://api.placements.io/v1/opportunity_line_items/67/relationships/opportunity",
+            "related": "https://api.placements.io/v1/opportunity_line_items/67/opportunity"
+          },
+          "data": {
+            "type": "opportunities",
+            "id": "11"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "errors": [
+    {
+      "status": 429,
+      "title": "You have sent too many requests, please retry later",
+      "detail": "Your quota is xxx requests per xxx seconds"
+    }
+  ]
+}

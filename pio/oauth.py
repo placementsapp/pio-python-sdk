@@ -6,7 +6,7 @@ import logging
 import datetime
 import httpx
 import time
-from pio.utility.environments import API
+from pio.model.environment import API
 from pio.model.oauth import ModelScopes
 from pio.pio import PlacementsIO
 

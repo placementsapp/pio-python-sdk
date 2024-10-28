@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": "1",
+      "type": "rate-cards",
+      "links": {
+        "self": "https://api.placements.io/v1/rate_cards/1"
+      },
+      "attributes": {
+        "last-modified": "2020-01-08T22:41:04.403Z",
+        "active": true,
+        "name": "Minnesota bees - b960",
+        "description": "Cumque esse sed aut id.",
+        "global-discount-percent": 22.02,
+        "global-discount-apply-to-targeting": true
+      },
+      "relationships": {
+        "product-rates": {}
+      }
+    }
+  ]
+}

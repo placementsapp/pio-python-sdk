@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "id": "100268",
+      "type": "accounts",
+      "links": {
+        "self": "https://api.placements.io/v1/accounts/100268"
+      },
+      "attributes": {
+        "name": "The Home Depot",
+        "ad-server-info": [
+          {
+            "ad-server": "dfp",
+            "ad-server-id": 20227938,
+            "ad-server-network-code": "88650439"
+          }
+        ],
+        "freewheel-industries": ["12345", "54321"],
+        "madhive-iab-category-id": "IAB1",
+        "octillion-iab-category-id": "IAB1"
+      }
+    }
+  ]
+}

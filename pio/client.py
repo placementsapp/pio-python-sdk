@@ -59,6 +59,28 @@ class PlacementsIOClient:
             "x-metadata": json.dumps({"release": "alpha"}),
         }
 
+    async def client_request(
+        self, client: httpx.AsyncClient, method: str, resource: str, request: dict
+    ) -> httpx.Response:
+        client_method = getattr(client, method)
+        request = {
+            "url": resource,
+            "headers": self.headers(),
+            **request,
+        }
+        if request.get("data"):
+            request["data"] = json.dumps(request["data"], default=str, cls=JSONEncoder)
+        response = await client_method(**request)
+        if response.status_code == 429:
+            retry_after = int(response.headers.get("Retry-After", 60))
+            self.logger.warning(
+                "Rate limit reached. Waiting %s seconds before retrying...",
+                retry_after,
+            )
+            await asyncio.sleep(retry_after)
+            return await self.client_request(client, method, resource, request)
+        return response
+
     async def client(
         self,
         service: str,
@@ -72,25 +94,19 @@ class PlacementsIOClient:
         # TODO: Need to have a way to call multiple IDs at the same time
         async with httpx.AsyncClient(base_url=self.base_url, timeout=60) as client:
 
-            async def make_request(service_name: str, service_param: dict) -> dict:
-                return await client.get(
-                    headers=self.headers(),
-                    url=service_name,
-                    params=service_param,
-                )
-
             param = param or {}
             param.update(self.pagination())
             param.update(self._filter_values(filters))
             param.update(self._include_values(includes))
             self.logger.info("Fetching data from %s", service)
-            response = await make_request(service, param)
+            response = await self.client_request(
+                client, "get", service, {"params": param}
+            )
             data = response.json()
-            self.logger.debug(json.dumps(data, indent=4, default=str, cls=JSONEncoder))
             errors = data.get("errors", [])
             if errors:
                 raise APIError(errors)
-            results = data.get("data", {})
+            results = data.get("data", [])
             meta = data.get("meta", {})
             page_count = meta.get("page-count", 0)
             if page_count > 1:
@@ -103,7 +119,9 @@ class PlacementsIOClient:
                 paginated_param = param.copy()
                 paginated_param.update(self.pagination(page_number))
                 tasks.append(
-                    make_request(service_name=service, service_param=paginated_param)
+                    self.client_request(
+                        client, "get", service, {"params": paginated_param}
+                    )
                 )
             responses = await asyncio.gather(*tasks)
             for response in responses:
@@ -130,7 +148,8 @@ class PlacementsIOClient:
 
         async def get_responses(resource_ids: list) -> dict:
 
-            async def make_request(resource_ids: int) -> dict:
+            async def make_multiple_requests(resource_ids: int) -> dict:
+
                 async with httpx.AsyncClient(
                     base_url=self.base_url, timeout=60
                 ) as client:
@@ -168,11 +187,7 @@ class PlacementsIOClient:
                             json.dumps(payload, indent=4, default=str, cls=JSONEncoder),
                         )
                         tasks.append(
-                            client.patch(
-                                url,
-                                headers=self.headers(),
-                                data=json.dumps(payload, default=str, cls=JSONEncoder),
-                            )
+                            self.client_request(client, "patch", url, {"data": payload})
                         )
                     return await asyncio.gather(*tasks)
 
@@ -188,7 +203,7 @@ class PlacementsIOClient:
                         "Waiting %s seconds before retrying...", retry_after
                     )
                     await asyncio.sleep(retry_after)
-                responses = await make_request(resource_ids)
+                responses = await make_multiple_requests(resource_ids)
                 responses_dict.update(dict(zip(resource_ids, responses)))
 
                 # Now look for 429 responses to retry, or update the response with JSON
@@ -219,7 +234,7 @@ class PlacementsIOClient:
 
         async def get_responses(objects: list) -> list:
 
-            async def make_request(objects) -> list:
+            async def make_multiple_requests(objects) -> list:
                 async with httpx.AsyncClient(
                     base_url=self.base_url, timeout=60
                 ) as client:
@@ -244,10 +259,8 @@ class PlacementsIOClient:
                             }
                         }
                         tasks.append(
-                            client.post(
-                                service,
-                                headers=self.headers(),
-                                data=json.dumps(payload, default=str, cls=JSONEncoder),
+                            self.client_request(
+                                client, "post", service, {"data": payload}
                             )
                         )
                     return await asyncio.gather(*tasks)
@@ -263,7 +276,7 @@ class PlacementsIOClient:
                         "Waiting %s seconds before retrying...", retry_after
                     )
                     await asyncio.sleep(retry_after)
-                responses = await make_request(objects)
+                responses = await make_multiple_requests(objects)
 
                 # Now look for 429 responses to retry, or update the response with JSON
                 for response in responses:

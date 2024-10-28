@@ -6,7 +6,7 @@ import os
 import logging
 from typing import Unpack, Union
 from pio.client import PlacementsIOClient
-from pio.utility.environments import API
+from pio.model.environment import API
 from pio.model.get import (
     ModelFilterDefaults,
     ModelFilterAccount,
@@ -172,6 +172,17 @@ class PlacementsIO:
         )
 
     @property
+    def external_users(self) -> Service:
+        """
+        Returns a External Users Service object for use in interacting with the API
+        """
+        return self.Service(
+            **self.settings,
+            service="external_users",
+            model={"get": ModelFilterCustomField},
+        )
+
+    @property
     def groups(self) -> Service:
         """
         Returns a Groups Service object for use in interacting with the API
@@ -187,6 +198,17 @@ class PlacementsIO:
         """
         return self.Service(
             **self.settings, service="line_items", model={"get": ModelFilterLineItem}
+        )
+
+    @property
+    def line_item_creative_associations(self) -> Service:
+        """
+        Returns a Line Item Creative Associations Service object for use in interacting with the API
+        """
+        return self.Service(
+            **self.settings,
+            service="line_item_creative_associations",
+            model={"get": ModelFilterDefaults},
         )
 
     @property

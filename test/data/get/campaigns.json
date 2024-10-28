@@ -1,0 +1,50 @@
+{
+  "data": [
+    {
+      "id": "41",
+      "type": "campaigns",
+      "links": {
+        "self": "https://api.placements.io/v1/campaigns/41"
+      },
+      "attributes": {
+        "name": "Test Campaign 1",
+
+        "trafficker-info": {
+          "email": "russ.wilson_2000@example.org"
+        },
+        "sales-planner-info": {
+          "email": "2005_arlo_lebsack@example.net"
+        },
+        "primary-salesperson-info": {
+          "email": "1979_greenholt_melody@example.org",
+          "split-percent": 80
+        },
+        "secondary-salespeople-info": [
+          {
+            "email": "dewitt.stoltenberg.2016@example.com",
+            "split-percent": 20
+          }
+        ],
+        "ad-server-info": [
+          {
+            "ad-server": "dfp",
+            "ad-server-id": 20227938,
+            "ad-server-network-code": "88650439"
+          }
+        ]
+      },
+      "relationships": {
+        "advertiser": {
+          "links": {
+            "self": "https://api.placements.io/v1/campaigns/41/relationships/advertiser",
+            "related": "https://api.placements.io/v1/campaigns/41/advertiser"
+          },
+          "data": {
+            "type": "accounts",
+            "id": "3549"
+          }
+        }
+      }
+    }
+  ]
+}

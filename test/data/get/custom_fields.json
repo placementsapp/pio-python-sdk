@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "id": "999",
+      "type": "custom-fields",
+      "links": {
+        "self": "https://api.placements.io/v1/custom_fields/999"
+      },
+      "attributes": {
+        "last-modified": "2023-05-14T22:31:43.243Z",
+        "active": false,
+        "name": "XXXXXXX",
+        "default-values": null,
+        "entity": "Account",
+        "field-type": "TEXT",
+        "required": false,
+        "values": null
+      }
+    }
+  ]
+}
