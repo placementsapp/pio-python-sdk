@@ -68,7 +68,7 @@ class PlacementsIOClient:
             "headers": self.headers(),
             **request,
         }
-        if request.get("data"):
+        if request.get("data") and not isinstance(request["data"], str):
             request["data"] = json.dumps(request["data"], default=str, cls=JSONEncoder)
         response = await client_method(**request)
         if response.status_code == 429:
@@ -137,6 +137,7 @@ class PlacementsIOClient:
         resource_ids: list,
         attributes: Union[callable, dict] = None,
         relationships: Union[callable, dict] = None,
+        params: dict = None,
     ) -> dict:
         """
         Update existing resources within the service
@@ -182,43 +183,55 @@ class PlacementsIOClient:
                             }
                         }
                         self.logger.info(
-                            "Updating %s with payload: %s",
+                            "Updating %s %s",
                             url,
+                            params,
+                        )
+                        self.logger.debug(
+                            "Payload: %s",
                             json.dumps(payload, indent=4, default=str, cls=JSONEncoder),
                         )
                         tasks.append(
-                            self.client_request(client, "patch", url, {"data": payload})
+                            self.client_request(
+                                client,
+                                "patch",
+                                url,
+                                {"data": payload, "params": params},
+                            )
                         )
                     return await asyncio.gather(*tasks)
 
-            attempts = 0
-            retry_after = 60
             responses_dict = {}
-            while resource_ids:
-                if attempts:
-                    self.logger.warning(
-                        "%s Resource IDs remaining...", len(resource_ids)
-                    )
-                    self.logger.warning(
-                        "Waiting %s seconds before retrying...", retry_after
-                    )
-                    await asyncio.sleep(retry_after)
-                responses = await make_multiple_requests(resource_ids)
-                responses_dict.update(dict(zip(resource_ids, responses)))
-
-                # Now look for 429 responses to retry, or update the response with JSON
-                resource_ids = []
-                for resource_id, response in responses_dict.items():
-                    if response.status_code == 429:
-                        resource_ids.append(resource_id)
-                    else:
-                        responses_dict[resource_id] = response
-                attempts += 1
+            responses = await make_multiple_requests(resource_ids)
+            responses_dict.update(dict(zip(resource_ids, responses)))
             return responses_dict
 
-        raw_responses = await get_responses(resource_ids)
+        # Handle if the user sends in dict.keys() or dict.values() for 
+        # resource ids since this cannot be iterated
+        # if isinstance(resource_ids, (type({}.keys()), type({}.values()))):
+        #     resource_ids = list(resource_ids)
+
+        # Split resource_ids into chunks of 100
+        chunk_size = 100
+        raw_responses = {}
+        for index in range(0, len(list(resource_ids)), chunk_size):
+            chunk = resource_ids[index : index + chunk_size]
+            chunk_responses = await get_responses(chunk)
+            raw_responses.update(chunk_responses)
+
         expanded_responses = [
-            response.json().get("data", response.json())
+            (
+                response.json().get(
+                    "data", {**response.json(), "links": {"self": response.request.url}}
+                )
+                if response.content
+                else {
+                    "errors": [
+                        {"title": "No data", "detail": "No data was returned in the API response"}
+                    ],
+                    "links": {"self": response.request.url},
+                }
+            )
             for response in raw_responses.values()
         ]
         return expanded_responses

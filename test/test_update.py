@@ -110,7 +110,9 @@ async def test_update_with_static_attributes_relationships(mock_request):
     """Tests an update request with static attributes and relationships"""
     with open("test/data/get/accounts.json", encoding="utf-8") as response:
         mock_request.return_value = httpx.Response(
-            status_code=200, json=json.load(response)
+            status_code=200,
+            json=json.load(response),
+            request=httpx.Request("PATCH", "..."),
         )
 
     pio = PlacementsIO(environment="staging", token="foo")
@@ -137,7 +139,9 @@ async def test_update_with_dynamic_attributes_relationships(mock_request):
     """Tests an update request with dynamic attributes and relationships"""
     with open("test/data/get/accounts.json", encoding="utf-8") as response:
         mock_request.return_value = httpx.Response(
-            status_code=200, json=json.load(response)
+            status_code=200,
+            json=json.load(response),
+            request=httpx.Request("PATCH", "..."),
         )
 
     pio = PlacementsIO(environment="staging", token="foo")

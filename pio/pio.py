@@ -85,6 +85,7 @@ class PlacementsIO:
             resource_ids: list,
             attributes: Union[callable, dict] = None,
             relationships: Union[callable, dict] = None,
+            params: dict = None,
         ) -> dict:
             """
             Update existing resources within the service
@@ -94,6 +95,7 @@ class PlacementsIO:
                 resource_ids=resource_ids,
                 attributes=attributes,
                 relationships=relationships,
+                params=params,
             )
 
         async def create(
