@@ -1,7 +1,7 @@
 """
-python example/campaign/update_start_and_end_date_of_campaigns.py \
+python example/creative/update_creative_details.py \
     --attributes '{
-    "600220": {"start-date": "2024-10-07 00:00:00 -04:00", "end-date": "2024-12-31 11:59:59 -04:00"}
+    "15700": {"width": "640", "height": "480"}
 }'
 """
 
@@ -16,25 +16,21 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_start_and_end_date_of_campaigns(
-    environment: str, token: str, attributes: dict
-):
+async def update_creative_details(environment: str, token: str, attributes: dict):
     pio = PlacementsIO(environment=environment, token=token)
 
-    async def update_campaign_settings(campaign_id):
-        return attributes[campaign_id]
+    async def update_creative_settings(creative_id):
+        return attributes[creative_id]
 
-    results = await pio.campaigns.update(
+    results = await pio.creatives.update(
         attributes.keys(),
-        attributes=update_campaign_settings,
+        attributes=update_creative_settings,
     )
     print(json.dumps(results, indent=4, default=str))
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Update the start and end date of campaigns."
-    )
+    parser = argparse.ArgumentParser(description="Update the attributes of creatives.")
     parser.add_argument(
         "--environment",
         type=str,
@@ -44,7 +40,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--attributes",
         type=json.loads,
-        help="A dictionary of campaign IDs to dictionaries of attributes to update.",
+        help="A dictionary of creative IDs with dictionaries of attributes to update.",
     )
     args = parser.parse_args()
-    asyncio.run(update_start_and_end_date_of_campaigns(**vars(args)))
+    asyncio.run(update_creative_details(**vars(args)))

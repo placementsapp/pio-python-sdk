@@ -1,7 +1,5 @@
 """
 python example/opportunity/get_opportunity.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --opportunity_id 419972
 """
 

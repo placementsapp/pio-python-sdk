@@ -1,7 +1,5 @@
 """
 python example/account/update_account_websites.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --websites '{
     111111: "https://placements.io/",
     222222: "https://app.placements.io/",

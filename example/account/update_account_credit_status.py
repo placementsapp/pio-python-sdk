@@ -1,7 +1,5 @@
 """
 python example/account/update_account_credit_status.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --account_ids 1,2,3 \
     --credit_status 'ACTIVE'
 """

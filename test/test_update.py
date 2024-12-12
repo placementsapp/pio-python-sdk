@@ -11,6 +11,7 @@ from pytest_httpx import HTTPXMock
 from pio import PlacementsIO
 from pio.model.service import services
 
+API_SERVICES = [_ for _ in services if _ != "reports"]
 URL_REGEX = r"https://api-staging\.placements\.io/v1/(\w+)(\?.*)?"
 
 
@@ -69,7 +70,7 @@ def mock_rate_limit(httpx_mock: HTTPXMock):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("service", services)
+@pytest.mark.parametrize("service", API_SERVICES)
 async def test_update_success(service, mock_update_success):
     """Tests a successful update request"""
     pio = PlacementsIO(environment="staging", token="foo")
@@ -81,7 +82,7 @@ async def test_update_success(service, mock_update_success):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("service", services)
+@pytest.mark.parametrize("service", API_SERVICES)
 async def test_update_errors(service, mock_update_error):
     """Tests an update request that returns errors"""
     pio = PlacementsIO(environment="staging", token="foo")

@@ -1,7 +1,5 @@
 """
 python example/line_item/get_line_item_by_campaign.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --campaign_id 600220
 """
 

@@ -1,5 +1,5 @@
 """
-Placements.io API client library
+Placements.io Python SDK
 """
 
 from pio.pio import PlacementsIO

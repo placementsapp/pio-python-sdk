@@ -1,7 +1,5 @@
 """
 python example/product_rate/modify_product_rates_on_rate_cards.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --rate_settings '[
     {
         "rate_card_id": 992,

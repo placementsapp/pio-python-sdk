@@ -1,7 +1,5 @@
 """
 python example/account/get_recently_modified_accounts.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --modified-since "2024-10-01 00:00:00"
 """
 

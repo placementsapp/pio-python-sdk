@@ -11,7 +11,7 @@ from pio import PlacementsIO
 from pio.model.service import services
 from pio.error.api_error import APIError
 
-
+API_SERVICES = [_ for _ in services if _ != "reports"]
 URL_REGEX = r"https://api-staging\.placements\.io/v1/(\w+)(\?.*)?"
 
 
@@ -70,7 +70,7 @@ def mock_rate_limit(httpx_mock: HTTPXMock):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("service", services)
+@pytest.mark.parametrize("service", API_SERVICES)
 async def test_get_success(service, mock_get_success):
     """Test a successful GET request"""
     pio = PlacementsIO(environment="staging", token="foo")
@@ -82,7 +82,7 @@ async def test_get_success(service, mock_get_success):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("service", services)
+@pytest.mark.parametrize("service", API_SERVICES)
 async def test_get_errors(service, mock_get_error):
     """Test a failed GET request"""
     pio = PlacementsIO(environment="staging", token="foo")

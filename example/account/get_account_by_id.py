@@ -1,7 +1,5 @@
 """
 python example/account/get_account_by_id.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --account_id 1548215
 """
 

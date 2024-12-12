@@ -1,6 +1,6 @@
 """
-python example/opportunity_line_item/get_opportunity_line_item.py \
-    --opportunity_line_item 1136338
+python example/creative/get_creative.py \
+    --creative_id 15700
 """
 
 import json
@@ -14,18 +14,14 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def get_opportunity_line_item(
-    environment: str, token: str, opportunity_line_item: int
-):
+async def get_creative(environment: str, token: str, creative_id: int):
     pio = PlacementsIO(environment=environment, token=token)
-    result = await pio.opportunity_line_items.get(id=opportunity_line_item)
-    print(json.dumps(result, indent=4, default=str))
+    creative = await pio.creatives.get(id=creative_id)
+    print(json.dumps(creative, indent=4, default=str))
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Get information on an opportunity line item."
-    )
+    parser = argparse.ArgumentParser(description="Get creative information.")
     parser.add_argument(
         "--environment",
         type=str,
@@ -33,9 +29,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
-        "--opportunity_line_item",
+        "--creative_id",
         type=int,
-        help="The opportunity line item id",
+        help="The creative id to get.",
     )
     args = parser.parse_args()
-    asyncio.run(get_opportunity_line_item(**vars(args)))
+    asyncio.run(get_creative(**vars(args)))

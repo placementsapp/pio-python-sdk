@@ -1,12 +1,17 @@
 """
-Placements.io API client library
+Placements.io Python SDK
 """
 
 import os
 import logging
+import datetime
+import csv
+import time
 from typing import Unpack, Union
 from pio.client import PlacementsIOClient
+from pio.error.api_error import APIError
 from pio.model.environment import API
+from pio.model.report import COLUMNS
 from pio.model.get import (
     ModelFilterDefaults,
     ModelFilterAccount,
@@ -25,19 +30,23 @@ from pio.model.get import (
     ModelFilterReport,
     ModelFilterUser,
 )
+import httpx
 
 
 class PlacementsIO:
     """
-    Placements.io API client library
+    Placements.io Python SDK
     """
 
-    def __init__(self, environment: str = "staging", token: str = None):
-        self.base_url = API[environment]
+    def __init__(self, environment: str = None, token: str = None):
+        environment = (
+            environment or os.environ.get(f"PLACEMENTS_IO_ENVIRONMENT") or "staging"
+        )
+        self.base_url = API.get(environment, environment)
         self.token = (
             token
-            or os.getenv(f"PLACEMENTS_IO_API_TOKEN_{environment.upper()}")
-            or os.getenv("PLACEMENTS_IO_API_TOKEN")
+            or os.environ.get(f"PLACEMENTS_IO_TOKEN_{environment.upper()}")
+            or os.environ.get("PLACEMENTS_IO_TOKEN")
         )
         self.logger = logging.getLogger("pio")
         self.settings = {
@@ -71,13 +80,21 @@ class PlacementsIO:
             self.model = model
 
         async def get(
-            self, include: list = None, **args: Unpack[ModelFilterAccount]
+            self,
+            include: list = None,
+            fields: list = None,
+            params: dict = None,
+            **args: Unpack[ModelFilterAccount],
         ) -> list:
             """
             Get existing resources within the service
             """
             return await self.client(
-                service=self.service, includes=include, filters=args
+                service=self.service,
+                includes=include,
+                filters=args,
+                fields=fields,
+                param=params,
             )
 
         async def update(
@@ -109,6 +126,86 @@ class PlacementsIO:
                 service=self.service,
                 objects=objects,
             )
+
+    class ReportService(Service):
+        """
+        Class for interacting with API Reports Service
+        """
+
+        TODAY_START = datetime.datetime.now(datetime.timezone.utc).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        TODAY_END = datetime.datetime.now(datetime.timezone.utc).replace(
+            hour=23, minute=59, second=59, microsecond=999
+        )
+
+        async def create(
+            self, start_date=TODAY_START, end_date=TODAY_END, columns: list = COLUMNS
+        ) -> int:
+            """
+            Create a new report
+            """
+            report_creation_request = [
+                {
+                    "attributes": {
+                        "definition": {
+                            "start-date": start_date,
+                            "end-date": end_date,
+                            "columns": columns,
+                        }
+                    }
+                }
+            ]
+            report_creation = await self.client_create(
+                service=self.service, objects=report_creation_request
+            )
+            report_id = report_creation[0].get("id")
+            return report_id
+
+        async def get(self, resource_id: int) -> dict:
+            """
+            Get existing resources within the service
+            """
+            return await self.resource(service=self.service, resource_id=resource_id)
+
+        async def data(self, report_id: dict) -> list:
+            """
+            Returns report data in a list of dictionaries
+            """
+
+            report_response = await self.get(report_id)
+            status = report_response.get("attributes", {}).get("status")
+            while status in ["pending", "in_progress"]:
+                self.logger.info(f"Report is currently {status}. Retrying in 5 seconds")
+                time.sleep(5)
+                report_response = await self.get(report_id)
+                status = report_response.get("attributes", {}).get("status")
+            if status == "failed":
+                raise APIError(
+                    report_response.get("attributes", {}).get("error-message")
+                )
+
+            download_url = report_response.get("attributes", {}).get("download-url")
+            if not download_url:
+                raise APIError(
+                    "No download report URL found in response. Unable to download report data.",
+                    report_response,
+                )
+            async with httpx.AsyncClient() as data_client:
+                async with data_client.stream(
+                    "GET", download_url, follow_redirects=True
+                ) as response:
+                    response.raise_for_status()
+                    lines = []
+                    async for line in response.aiter_lines():
+                        lines.append(line)
+                    csv_reader = csv.reader(lines)
+                    headers = next(csv_reader)
+                    rows = []
+                    for row in csv_reader:
+                        for row in csv_reader:
+                            rows.append(dict(zip(headers, row)))
+                    return rows
 
     async def oauth2(self, client_id: str, redirect_url: str) -> Service:
         """
@@ -280,7 +377,7 @@ class PlacementsIO:
         """
         Returns a Reports Service object for use in interacting with the API
         """
-        return self.Service(
+        return self.ReportService(
             **self.settings, service="reports", model={"get": ModelFilterReport}
         )
 

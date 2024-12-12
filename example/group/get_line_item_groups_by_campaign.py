@@ -1,7 +1,5 @@
 """
 python example/campaign/get_line_item_groups_by_campaign.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --campaign_id 123
 """
 

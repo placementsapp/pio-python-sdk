@@ -1,7 +1,5 @@
 """
 python example/account/update_agency_holding_company.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --campaign_ids 1,2,3 \
     --agency_holding_company_account_id 123
 """

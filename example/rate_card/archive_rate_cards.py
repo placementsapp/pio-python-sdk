@@ -1,7 +1,5 @@
 """
 python example/rate_card/archive_rate_cards.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --rate_cards "992,993,994"
 """
 

@@ -1,7 +1,5 @@
 """
 python example/opportunity_line_item/get_opportunity_line_item_by_name.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --opportunity_line_item_name 'Opportunity Line'
 """
 

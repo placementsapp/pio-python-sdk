@@ -1,7 +1,5 @@
 """
 python example/opportunity_line_item/set_opportunity_line_item_name_from_custom_field.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --opportunity_line_items 1,2,3 \
     --custom_field_name 'FCAP Buy Name'
 """

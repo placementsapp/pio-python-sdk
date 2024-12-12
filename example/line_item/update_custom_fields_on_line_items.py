@@ -1,7 +1,5 @@
 """
 python example/line_item/update_custom_fields_on_line_items.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --params '{"skip_missing_custom_fields": true}' \
     --attributes '{
     "3701454": {"custom-fields": {"Field Name": "Value"}}

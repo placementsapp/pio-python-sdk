@@ -1,5 +1,5 @@
 """
-Placements.io API client library Errors
+Placements.io Python SDK errors
 """
 
 

@@ -1,7 +1,5 @@
 """
 python example/line_item/update_start_and_end_date_of_line_items.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --attributes '{
     "3701454": {"start-date": "2024-10-07 00:00:00 -04:00", "end-date": "2024-12-31 11:59:59 -04:00"}
 }'

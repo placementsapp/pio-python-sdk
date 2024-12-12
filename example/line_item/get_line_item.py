@@ -1,7 +1,5 @@
 """
 python example/line_item/get_line_item.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --line_item_id 7059899
 """
 
@@ -18,7 +16,7 @@ logging.getLogger("pio").setLevel(logging.DEBUG)
 
 async def get_line_item(environment: str, token: str, line_item_id: int):
     pio = PlacementsIO(environment=environment, token=token)
-    line_item = await pio.line_items.get(id=line_item_id)
+    line_item = await pio.line_items.get(id=line_item_id, params={"stats": True})
     print(json.dumps(line_item, indent=4, default=str))
 
 

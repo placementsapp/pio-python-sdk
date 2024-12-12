@@ -1,7 +1,11 @@
 [tool.poetry]
-name = "placements-io-api"
+name = "placements-io"
 version = "0.0.1"
-description = "Client library for the Placements.io API"
+license = "Proprietary"
+description = "Placements.io Python Software Development Kit"
+homepage = "https://placements.io"
+repository = "https://github.com/placementsapp/pio-python-sdk"
+documentation = "https://api.placements.io/doc/#resources"
 authors = [
     "Placements.io",
     "Andrew Bowman <abowman@placements.io>",

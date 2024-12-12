@@ -1,7 +1,5 @@
 """
 python example/account/update_budget_on_line_item_group.py \
-    --environment staging \
-    --token $(op read "op://PIO API Keys/PIO - Staging/credential") \
     --group_ids 1,2,3 \
     --budget 1234.56
 """
