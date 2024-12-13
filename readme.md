@@ -283,7 +283,7 @@ The create method has the following parameters and default values:
 | --------- | ------- | ------ |
 | start_date | datetime | Todays date at 00:00:00 UTC |
 | end_date | datetime | Todays date at 23:59:59 UTC |
-| columns | list of strings | Defaults to [all columns](https://github.com/placementsapp/pio-python-sdk/blob/main/pio/model/service.py) |
+| columns | list of strings | Defaults to [all columns](https://github.com/placementsapp/pio-python-sdk/blob/main/pio/model/report.py) |
 
 The `create` service then returns an integer of the report that has been queued. This id can then be passed into either the `get` method to return the response from the report service for that report, or the `data` service which will poll the report service until the service responds with a success or failure message. The data service will respond with the list of report data which can then be used in further analysis such as through the [Pandas](https://pypi.org/project/pandas/) Python package:
 
