@@ -13,5 +13,5 @@ class JSONEncoder(json.JSONEncoder):
 
     def default(self, o):
         if isinstance(o, datetime.datetime):
-            return o.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        return super().default(o)
+            return o.isoformat()
+        return super().default(o)  # pragma: no cover

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "placements-io"
-version = "0.0.1-alpha.002"
+version = "0.0.1-alpha.003"
 license = "Proprietary"
 description = "Placements.io Python Software Development Kit"
 homepage = "https://placements.io"
@@ -72,5 +72,5 @@ commands = [
 
 [tool.tox.env.report]
 commands = [
-    ["poetry", "run", "pytest", "--verbose", "--cov=pio"]
+    ["poetry", "run", "pytest", "--verbose", "--cov=pio", "--cov-report", "term-missing"]
 ]

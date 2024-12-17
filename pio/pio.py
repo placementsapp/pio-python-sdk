@@ -203,8 +203,7 @@ class PlacementsIO:
                     headers = next(csv_reader)
                     rows = []
                     for row in csv_reader:
-                        for row in csv_reader:
-                            rows.append(dict(zip(headers, row)))
+                        rows.append(dict(zip(headers, row)))
                     return rows
 
     async def oauth2(self, client_id: str, redirect_url: str) -> Service:

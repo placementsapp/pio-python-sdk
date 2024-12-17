@@ -1,15 +1,13 @@
 {
-  "data": [
-    {
-      "id": "4",
-      "type": "reports",
-      "attributes": {
-        "last-modified": "2020-09-18T21:48:00.760Z",
-        "definition": {},
-        "status": "completed",
-        "error-message": null,
-        "download-url": "https://..."
-      }
+  "data": {
+    "id": "4",
+    "type": "reports",
+    "attributes": {
+      "last-modified": "2020-09-18T21:48:00.760Z",
+      "definition": {},
+      "status": "completed",
+      "error-message": null,
+      "download-url": "https://example.com/report.csv"
     }
-  ]
+  }
 }

@@ -13,7 +13,7 @@ from pio.pio import PlacementsIO
 OAUTH_RESPONSE = None
 
 
-class OAuthMiniServer(http.server.SimpleHTTPRequestHandler):
+class OAuthMiniServer(http.server.SimpleHTTPRequestHandler):  # pragma: no cover
     def do_GET(self):
         # Parse the query parameters
         parsed_path = urllib.parse.urlparse(self.path)
