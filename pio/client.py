@@ -54,7 +54,7 @@ class PlacementsIOClient:
             "Content-Type": "application/vnd.api+json",
             "User-Agent": f"PlacementsIO Python SDK/{self._version}",
             "x-metadata": json.dumps(
-                {"method": method, "service": service, "is_retry": is_retry}
+                {"method": method, "service": service.split("/")[0], "is_retry": is_retry}
             ),
         }
 
