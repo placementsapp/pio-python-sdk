@@ -1,7 +1,7 @@
 """
-python example/account/update_account_rate_card.py \
-    --account_id 1549397 \
-    --rate_card_id 994
+python example/group/update_ad_server_id_on_group.py \
+    --group_id 11111 \
+    --ad_server_id 'abc-123'
 """
 
 import json
@@ -15,25 +15,25 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_account_rate_card(
+async def update_ad_server_id_on_group(
     environment: str,
     token: str,
-    account_id: int,
-    rate_card_id: int = None,
+    group_id: int,
+    ad_server_id: str,
 ):
     pio = PlacementsIO(environment=environment, token=token)
 
-    results = await pio.accounts.update(
-        [account_id],
-        relationships={
-            "rate-card": {"data": {"id": rate_card_id}} if rate_card_id else None
-        },
+    results = await pio.groups.update(
+        resource_ids=[group_id],
+        attributes={"ad-server-id": ad_server_id},
     )
     print(json.dumps(results, indent=4, default=str))
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Update account rate card")
+    parser = argparse.ArgumentParser(
+        description="Update the ad server id for line item groups."
+    )
     parser.add_argument(
         "--environment",
         type=str,
@@ -41,14 +41,14 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
-        "--account_id",
+        "--group_id",
         type=int,
-        help="The account id to update",
+        help="The line item group id to update",
     )
     parser.add_argument(
-        "--rate_card_id",
-        type=int,
-        help="The rate card id to relate to the account",
+        "--ad_server_id",
+        type=str,
+        help="The ad server id to set for the line item groups.",
     )
     args = parser.parse_args()
-    asyncio.run(update_account_rate_card(**vars(args)))
+    asyncio.run(update_ad_server_id_on_group(**vars(args)))

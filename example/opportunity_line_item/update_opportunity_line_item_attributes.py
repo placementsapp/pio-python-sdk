@@ -18,9 +18,7 @@ logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
 async def update_opportunity_line_item_attributes(
-    environment: str,
-    token: str,
-    attributes: dict, push_to_crm: bool = True
+    environment: str, token: str, attributes: dict, push_to_crm: bool = True
 ):
     pio = PlacementsIO(environment=environment, token=token)
 
