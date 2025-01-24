@@ -45,6 +45,7 @@ def mock_read_completed(httpx_mock: HTTPXMock):
 
     httpx_mock.add_callback(custom_response)
 
+
 @pytest.fixture()
 def mock_get_report_csv(httpx_mock: HTTPXMock):
     """
@@ -57,6 +58,7 @@ def mock_get_report_csv(httpx_mock: HTTPXMock):
             content=response.read(),
             status_code=200,
         )
+
 
 @pytest.mark.asyncio
 async def test_create_report_no_parameters(mock_create_success):

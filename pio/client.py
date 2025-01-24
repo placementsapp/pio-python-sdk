@@ -54,7 +54,11 @@ class PlacementsIOClient:
             "Content-Type": "application/vnd.api+json",
             "User-Agent": f"PlacementsIO Python SDK/{self._version}",
             "x-metadata": json.dumps(
-                {"method": method, "service": service.split("/")[0], "is_retry": is_retry}
+                {
+                    "method": method,
+                    "service": service.split("/")[0],
+                    "is_retry": is_retry,
+                }
             ),
         }
 
@@ -105,7 +109,9 @@ class PlacementsIOClient:
             param.update(self.pagination())
             param.update(self._filter_values(filters))
             param.update(self._list_values("include", includes))
-            param.update(self._list_values(f"fields[{service}]", fields))
+            param.update(
+                self._list_values(f"fields[{service.replace("_", "-")}]", fields)
+            )
             self.logger.info("Fetching data from %s", service)
             response = await self.client_request(
                 client, "get", service, {"params": param}

@@ -14,7 +14,7 @@ pip install placements-io
 
 An environment name and token are required when instantiating the `PlacementsIO` class.
 
-These may be set in plain-text in code, through environment variables, or a combination of the both:
+These may be set in plain-text in code, through environment variables, or a combination of either:
 
 ```python3
 pio = PlacementsIO(environment="staging", token="...")

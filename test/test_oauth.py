@@ -15,6 +15,7 @@ from pio.error.api_error import APIError
 # API_SERVICES = [_ for _ in services if _ != "reports"]
 URL_REGEX = r"https://api-staging\.placements\.io/v1/(\w+)(\?.*)?"
 
+
 @pytest.fixture(autouse=True)
 def mock_get(httpx_mock: HTTPXMock):
     """
@@ -27,6 +28,7 @@ def mock_get(httpx_mock: HTTPXMock):
             json=json.load(response),
             status_code=400,
         )
+
 
 @pytest.fixture(autouse=True)
 def mock_oauth_post(httpx_mock: HTTPXMock):
@@ -53,9 +55,7 @@ async def test_oauth_authentication(mock_tcp_server, mock_webbrowser_open, mock_
     mock_httpd.handle_request.side_effect = lambda: ()
 
     pio = PlacementsIO_OAuth(
-        environment="staging",
-        application_id="abc123",
-        client_secret="abc123"
+        environment="staging", application_id="abc123", client_secret="abc123"
     )
     accounts = await pio.accounts.get()
     assert accounts
