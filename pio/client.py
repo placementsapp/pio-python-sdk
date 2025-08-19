@@ -110,7 +110,7 @@ class PlacementsIOClient:
             param.update(self._filter_values(filters))
             param.update(self._list_values("include", includes))
             param.update(
-                self._list_values(f"fields[{service.replace("_", "-")}]", fields)
+                self._list_values(f"fields[{service.replace('_', '-')}]", fields)
             )
             self.logger.info("Fetching data from %s", service)
             response = await self.client_request(
