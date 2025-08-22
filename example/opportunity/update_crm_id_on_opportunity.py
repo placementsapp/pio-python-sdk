@@ -1,10 +1,8 @@
 """
-python example/contact/update_contact_attributes.py \
-    --push_to_ad_server True \
+python example/opportunity/update_crm_id_on_opportunity.py \
     --push_to_crm True \
-    --attributes '{
-    "1502638": {"comments": "Updated contact details"}
-}'
+    --opportunity_id 11111 \
+    --crm_id 'abc-123'
 """
 
 import json
@@ -18,23 +16,19 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_contact_attributes(
+async def update_crm_id_on_opportunity(
     environment: str,
     token: str,
-    attributes: dict,
-    push_to_ad_server: bool = True,
+    opportunity_id: int,
+    crm_id: str,
     push_to_crm: bool = True,
 ):
     pio = PlacementsIO(environment=environment, token=token)
 
-    async def update_contact_settings(contact_id):
-        return attributes[contact_id]
-
-    results = await pio.contacts.update(
-        attributes.keys(),
-        attributes=update_contact_settings,
+    results = await pio.opportunities.update(
+        resource_ids=[opportunity_id],
+        attributes={"salesforce-id": crm_id},
         params={
-            "skip_push_to_ad_server": (not push_to_ad_server),
             "skip_push_to_crm": (not push_to_crm),
         },
     )
@@ -42,7 +36,7 @@ async def update_contact_attributes(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Update the attributes of contacts.")
+    parser = argparse.ArgumentParser(description="Update the CRM id for opportunity.")
     parser.add_argument(
         "--environment",
         type=str,
@@ -50,21 +44,20 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
-        "--push_to_ad_server",
-        type=lambda v: v.lower() != "false",
-        default=True,
-        help="Whether to push the changes to the ad server after update.",
-    )
-    parser.add_argument(
         "--push_to_crm",
         type=lambda v: v.lower() != "false",
         default=True,
         help="Whether to push the changes to the CRM after update.",
     )
     parser.add_argument(
-        "--attributes",
-        type=json.loads,
-        help="A dictionary of contact IDs to dictionaries of attributes to update.",
+        "--opportunity_id",
+        type=int,
+        help="The opportunity id to update",
+    )
+    parser.add_argument(
+        "--crm_id",
+        type=str,
+        help="The CRM id to set for the opportunity.",
     )
     args = parser.parse_args()
-    asyncio.run(update_contact_attributes(**vars(args)))
+    asyncio.run(update_crm_id_on_opportunity(**vars(args)))
