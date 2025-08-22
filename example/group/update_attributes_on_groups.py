@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--attributes",
         type=json.loads,
-        help="A dictionary of line item IDs to dictionaries of attributes to update.",
+        help="A dictionary of group IDs to dictionaries of attributes to update.",
     )
     args = parser.parse_args()
     asyncio.run(update_group_attributes(**vars(args)))
