@@ -28,6 +28,7 @@ async def update_creative_attributes(
     results = await pio.creatives.update(
         attributes.keys(),
         attributes=update_creative_settings,
+        params={"skip_push_to_ad_server": (not push_to_ad_server)},
     )
     print(json.dumps(results, indent=4, default=str))
 

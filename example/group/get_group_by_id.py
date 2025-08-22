@@ -7,7 +7,6 @@ import json
 from pio import PlacementsIO
 import logging
 import asyncio
-import datetime
 import argparse
 
 # Configure logging
