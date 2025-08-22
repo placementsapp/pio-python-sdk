@@ -71,7 +71,7 @@ class PlacementsIO_OAuth(PlacementsIO):
         }
         self._oauth_expiry = None
         self._set_oauth_expiry_time()
-        scopes_param = f"&scope={"+".join(scopes or [])}" if scopes else ""
+        scopes_param = f"&scope={'+'.join(scopes or [])}" if scopes else ""
         self.auth_url = (
             f"{self.oauth_base_url}authorize"
             f"?client_id={self.application_id}"
