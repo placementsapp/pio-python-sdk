@@ -3,10 +3,10 @@ python example/group/update_group_attributes.py \
     --push_to_ad_server True \
     --attributes '{
     "11111": {
-            "daily-budget": 111,
-            "lifetime-budget": 222,
-            "po-number": null
-        }
+        "daily-budget": 111,
+        "lifetime-budget": 222,
+        "po-number": null
+    }
 }'
 """
 
@@ -38,9 +38,7 @@ async def update_group_attributes(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Update the attributes of groups."
-    )
+    parser = argparse.ArgumentParser(description="Update the attributes of groups.")
     parser.add_argument(
         "--environment",
         type=str,

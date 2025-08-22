@@ -21,7 +21,9 @@ async def get_campaign_by_id(environment: str, token: str, network_code: int):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Get campaigns by ad server network code.")
+    parser = argparse.ArgumentParser(
+        description="Get campaigns by ad server network code."
+    )
     parser.add_argument(
         "--environment",
         type=str,

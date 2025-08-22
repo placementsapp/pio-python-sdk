@@ -17,7 +17,9 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_creative_attributes(environment: str, token: str, push_to_ad_server: bool, attributes: dict):
+async def update_creative_attributes(
+    environment: str, token: str, push_to_ad_server: bool, attributes: dict
+):
     pio = PlacementsIO(environment=environment, token=token)
 
     async def update_creative_settings(creative_id):
