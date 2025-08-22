@@ -21,7 +21,7 @@ async def update_salesforce_id_on_opportunity(
     token: str,
     opportunity_id: int,
     salesforce_id: str,
-    push_to_crm: bool = True
+    push_to_crm: bool = True,
 ):
     pio = PlacementsIO(environment=environment, token=token)
 
