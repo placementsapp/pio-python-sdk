@@ -1,5 +1,5 @@
 """
-python example/line_item/update_start_and_end_date_of_line_items.py \
+python example/line_item/update_line_item_attributes.py \
     --push_to_ad_server True \
     --attributes '{
     "3701454": {"start-date": "2024-10-07 00:00:00 -04:00", "end-date": "2024-12-31 11:59:59 -04:00"}
@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_start_and_end_date_of_line_items(
+async def update_line_item_attributes(
     environment: str, token: str, attributes: dict, push_to_ad_server: bool = True
 ):
     pio = PlacementsIO(environment=environment, token=token)
@@ -45,9 +45,9 @@ if __name__ == "__main__":
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
         "--push_to_ad_server",
-        type=bool,
-        help="Whether to push the changes to the ad server after update.",
+        type=lambda v: v.lower() != "false",
         default=True,
+        help="Whether to push the changes to the ad server after update.",
     )
     parser.add_argument(
         "--attributes",
@@ -55,4 +55,4 @@ if __name__ == "__main__":
         help="A dictionary of line item IDs to dictionaries of attributes to update.",
     )
     args = parser.parse_args()
-    asyncio.run(update_start_and_end_date_of_line_items(**vars(args)))
+    asyncio.run(update_line_item_attributes(**vars(args)))

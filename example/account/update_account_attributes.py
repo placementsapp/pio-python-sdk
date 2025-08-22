@@ -1,9 +1,9 @@
 """
-python example/contact/update_contact_attributes.py \
+python example/account/update_account_attributes.py \
     --push_to_ad_server True \
     --push_to_crm True \
     --attributes '{
-    "1502638": {"comments": "Updated contact details"}
+    "2": {"website": "http://example.com"}
 }'
 """
 
@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_contact_attributes(
+async def update_account_attributes(
     environment: str,
     token: str,
     attributes: dict,
@@ -27,12 +27,12 @@ async def update_contact_attributes(
 ):
     pio = PlacementsIO(environment=environment, token=token)
 
-    async def update_contact_settings(contact_id):
-        return attributes[contact_id]
+    async def update_account_settings(account_id):
+        return attributes[account_id]
 
-    results = await pio.contacts.update(
+    results = await pio.accounts.update(
         attributes.keys(),
-        attributes=update_contact_settings,
+        attributes=update_account_settings,
         params={
             "skip_push_to_ad_server": (not push_to_ad_server),
             "skip_push_to_crm": (not push_to_crm),
@@ -42,7 +42,7 @@ async def update_contact_attributes(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Update the attributes of contacts.")
+    parser = argparse.ArgumentParser(description="Update the attributes of accounts.")
     parser.add_argument(
         "--environment",
         type=str,
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--attributes",
         type=json.loads,
-        help="A dictionary of contact IDs to dictionaries of attributes to update.",
+        help="A dictionary of account IDs to dictionaries of attributes to update.",
     )
     args = parser.parse_args()
-    asyncio.run(update_contact_attributes(**vars(args)))
+    asyncio.run(update_account_attributes(**vars(args)))

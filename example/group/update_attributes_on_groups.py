@@ -1,8 +1,12 @@
 """
-python example/campaign/update_start_and_end_date_of_campaigns.py \
+python example/group/update_group_attributes.py \
     --push_to_ad_server True \
     --attributes '{
-    "600220": {"start-date": "2024-10-07 00:00:00 -04:00", "end-date": "2024-12-31 11:59:59 -04:00"}
+    "11111": {
+            "daily-budget": 111,
+            "lifetime-budget": 222,
+            "po-number": null
+        }
 }'
 """
 
@@ -17,17 +21,17 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_start_and_end_date_of_campaigns(
+async def update_group_attributes(
     environment: str, token: str, attributes: dict, push_to_ad_server: bool = True
 ):
     pio = PlacementsIO(environment=environment, token=token)
 
-    async def update_campaign_settings(campaign_id):
-        return attributes[campaign_id]
+    async def update_group_settings(group_id):
+        return attributes[group_id]
 
-    results = await pio.campaigns.update(
+    results = await pio.groups.update(
         attributes.keys(),
-        attributes=update_campaign_settings,
+        attributes=update_group_settings,
         params={"skip_push_to_ad_server": (not push_to_ad_server)},
     )
     print(json.dumps(results, indent=4, default=str))
@@ -35,7 +39,7 @@ async def update_start_and_end_date_of_campaigns(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Update the start and end date of campaigns."
+        description="Update the start and end date of line items."
     )
     parser.add_argument(
         "--environment",
@@ -45,14 +49,14 @@ if __name__ == "__main__":
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
         "--push_to_ad_server",
-        type=bool,
-        help="Whether to push the changes to the ad server after update.",
+        type=lambda v: v.lower() != "false",
         default=True,
+        help="Whether to push the changes to the ad server after update.",
     )
     parser.add_argument(
         "--attributes",
         type=json.loads,
-        help="A dictionary of campaign IDs to dictionaries of attributes to update.",
+        help="A dictionary of line item IDs to dictionaries of attributes to update.",
     )
     args = parser.parse_args()
-    asyncio.run(update_start_and_end_date_of_campaigns(**vars(args)))
+    asyncio.run(update_group_attributes(**vars(args)))

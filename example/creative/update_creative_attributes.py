@@ -1,5 +1,6 @@
 """
-python example/creative/update_creative_details.py \
+python example/creative/update_creative_attributes.py \
+    --push_to_ad_server True \
     --attributes '{
     "15700": {"width": "640", "height": "480"}
 }'
@@ -16,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("pio").setLevel(logging.DEBUG)
 
 
-async def update_creative_details(environment: str, token: str, attributes: dict):
+async def update_creative_attributes(environment: str, token: str, attributes: dict):
     pio = PlacementsIO(environment=environment, token=token)
 
     async def update_creative_settings(creative_id):
@@ -38,9 +39,15 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
+        "--push_to_ad_server",
+        type=lambda v: v.lower() != "false",
+        default=True,
+        help="Whether to push the changes to the ad server after update.",
+    )
+    parser.add_argument(
         "--attributes",
         type=json.loads,
         help="A dictionary of creative IDs with dictionaries of attributes to update.",
     )
     args = parser.parse_args()
-    asyncio.run(update_creative_details(**vars(args)))
+    asyncio.run(update_creative_attributes(**vars(args)))

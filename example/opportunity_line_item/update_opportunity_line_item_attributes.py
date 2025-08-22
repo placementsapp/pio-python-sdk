@@ -43,9 +43,9 @@ if __name__ == "__main__":
     parser.add_argument("--token", type=str, help="The token to use.")
     parser.add_argument(
         "--push_to_crm",
-        type=bool,
-        help="Whether to push the changes to the CRM after update.",
+        type=lambda v: v.lower() != "false",
         default=True,
+        help="Whether to push the changes to the CRM after update.",
     )
     parser.add_argument(
         "--attributes",
