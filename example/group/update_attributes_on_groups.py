@@ -39,7 +39,7 @@ async def update_group_attributes(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Update the start and end date of line items."
+        description="Update the attributes of groups."
     )
     parser.add_argument(
         "--environment",
