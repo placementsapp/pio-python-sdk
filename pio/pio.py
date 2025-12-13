@@ -9,6 +9,7 @@ import csv
 import time
 from typing import Unpack, Union
 from pio.client import PlacementsIOClient
+from pio.model.response import APIResponse
 from pio.error.api_error import APIError
 from pio.model.environment import API
 from pio.model.report import COLUMNS
@@ -85,7 +86,7 @@ class PlacementsIO:
             fields: list = None,
             params: dict = None,
             **args: Unpack[ModelFilterAccount],
-        ) -> list:
+        ) -> APIResponse:
             """
             Get existing resources within the service
             """

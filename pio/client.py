@@ -10,6 +10,7 @@ from typing import Union
 import httpx
 from pio.error.api_error import APIError
 from pio.utility.json_encoder import JSONEncoder
+from pio.model.response import APIResponse
 
 
 class PlacementsIOClient:
@@ -98,7 +99,7 @@ class PlacementsIOClient:
         filters: dict = None,
         includes: list = None,
         fields: list = None,
-    ) -> list:
+    ) -> APIResponse:
         """
         Get existing resources within the service
         """
@@ -121,6 +122,7 @@ class PlacementsIOClient:
             if errors:
                 raise APIError(errors)
             results = data.get("data", [])
+            included = data.get("included", [])
             meta = data.get("meta", {})
             page_count = meta.get("page-count", 0)
             if page_count > 1:
@@ -139,11 +141,11 @@ class PlacementsIOClient:
                 )
             responses = await asyncio.gather(*tasks)
             for response in responses:
-                data = response.json()
-                data = data.get("data", [])
-                results.extend(data)
+                page_data = response.json()
+                results.extend(page_data.get("data", []))
+                included.extend(page_data.get("included", []))
 
-            return results
+            return APIResponse(data=results, included=included, meta=meta)
 
     async def resource(
         self,
