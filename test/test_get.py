@@ -290,3 +290,83 @@ async def test_api_response_repr(mock_get_with_included):
     assert "APIResponse" in repr_str
     assert "1 items" in repr_str
     assert "included=4 items" in repr_str
+
+
+# ============================================================================
+# Tests for sparse fieldsets query parameters
+# ============================================================================
+
+
+@pytest.fixture()
+def mock_get_capture_request(httpx_mock: HTTPXMock):
+    """
+    Mocks a GET request and captures the request for inspection
+    """
+    captured_requests = []
+
+    def custom_response(request):
+        captured_requests.append(request)
+        return httpx.Response(status_code=200, json={"data": [], "meta": {}})
+
+    httpx_mock.add_callback(custom_response)
+    return captured_requests
+
+
+@pytest.mark.asyncio
+async def test_fields_list_sends_correct_query_param(mock_get_capture_request):
+    """Test that fields as list sends correct query parameter"""
+    pio = PlacementsIO(environment="staging", token="foo")
+    await pio.campaigns.get(fields=["name", "id"])
+
+    request = mock_get_capture_request[0]
+    params = dict(request.url.params)
+    assert params["fields[campaigns]"] == "name,id"
+
+
+@pytest.mark.asyncio
+async def test_fields_dict_sends_multiple_query_params(mock_get_capture_request):
+    """Test that fields as dict sends query params for each entity type"""
+    pio = PlacementsIO(environment="staging", token="foo")
+    await pio.campaigns.get(fields={
+        "campaigns": ["name", "ad-server-info"],
+        "accounts": ["custom-fields"]
+    })
+
+    request = mock_get_capture_request[0]
+    params = dict(request.url.params)
+    assert params["fields[campaigns]"] == "name,ad-server-info"
+    assert params["fields[accounts]"] == "custom-fields"
+
+
+@pytest.mark.asyncio
+async def test_fields_dict_normalizes_underscores_in_request(mock_get_capture_request):
+    """Test that underscores in field keys are normalized to hyphens in request"""
+    pio = PlacementsIO(environment="staging", token="foo")
+    await pio.line_items.get(fields={
+        "line_items": ["name", "start-date"],
+        "campaigns": ["id"]
+    })
+
+    request = mock_get_capture_request[0]
+    params = dict(request.url.params)
+    assert params["fields[line-items]"] == "name,start-date"
+    assert params["fields[campaigns]"] == "id"
+
+
+@pytest.mark.asyncio
+async def test_fields_with_include_sends_both_params(mock_get_capture_request):
+    """Test that fields and include can be used together"""
+    pio = PlacementsIO(environment="staging", token="foo")
+    await pio.campaigns.get(
+        include=["advertiser"],
+        fields={
+            "campaigns": ["name"],
+            "accounts": ["custom-fields"]
+        }
+    )
+
+    request = mock_get_capture_request[0]
+    params = dict(request.url.params)
+    assert params["include"] == "advertiser"
+    assert params["fields[campaigns]"] == "name"
+    assert params["fields[accounts]"] == "custom-fields"

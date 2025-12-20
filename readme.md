@@ -171,6 +171,28 @@ Providing no parameters will return all of the data for that resource; however i
 
 The response from the SDK will be a list of dictionaries, regardless of the number of results that will be returned.
 
+#### Sparse Fieldsets
+
+The `fields` parameter limits which attributes are returned. It accepts two formats:
+
+**List format** - applies to the primary resource:
+```python
+# Returns only ad-server-id, name and start-date for line-items
+pio.line_items.get(fields=["ad-server-id", "name", "start-date"])
+```
+
+**Dict format** - specify fields per resource type (useful with `include`):
+```python
+# Get line items with campaigns, limiting fields on both
+line_items = await pio.line_items.get(
+    include=["campaigns"],
+    fields={
+        "line-items": ["ad-server-id", "name", "start-date"],
+        "campaigns": ["ad-server-id", "end-date"]
+    }
+)
+```
+
 ### Update
 
 Requests to the `update` method will provide a HTTP patch requests to the Placements.io resource for the resource ids that are specified.

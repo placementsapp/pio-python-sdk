@@ -110,9 +110,7 @@ class PlacementsIOClient:
             param.update(self.pagination())
             param.update(self._filter_values(filters))
             param.update(self._list_values("include", includes))
-            param.update(
-                self._list_values(f"fields[{service.replace('_', '-')}]", fields)
-            )
+            param.update(self._fields_values(service, fields))
             self.logger.info("Fetching data from %s", service)
             response = await self.client_request(
                 client, "get", service, {"params": param}
@@ -352,3 +350,31 @@ class PlacementsIOClient:
         if relationships:
             params = {key: ",".join(relationships)}
         return params
+
+    def _fields_values(self, service: str, fields: Union[list, dict] = None) -> dict:
+        """
+        Convert fields parameter to JSON:API sparse fieldsets format.
+
+        Args:
+            service: The primary resource type (e.g., "campaigns")
+            fields: Either a list (applies to primary resource) or
+                    dict keyed by resource type
+
+        Returns:
+            Dict of query parameters like {"fields[campaigns]": "name,id"}
+        """
+        if not fields:
+            return {}
+
+        if isinstance(fields, list):
+            key = f"fields[{service.replace('_', '-')}]"
+            return {key: ",".join(fields)}
+
+        if isinstance(fields, dict):
+            params = {}
+            for resource_type, field_list in fields.items():
+                key = f"fields[{resource_type.replace('_', '-')}]"
+                params[key] = ",".join(field_list)
+            return params
+
+        return {}

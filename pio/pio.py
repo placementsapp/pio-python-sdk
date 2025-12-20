@@ -83,7 +83,7 @@ class PlacementsIO:
         async def get(
             self,
             include: list = None,
-            fields: list = None,
+            fields: Union[list, dict] = None,
             params: dict = None,
             **args: Unpack[ModelFilterAccount],
         ) -> APIResponse:
