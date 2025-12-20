@@ -392,6 +392,15 @@ class PlacementsIOClient:
 
         If fields is specified for the primary service and includes is specified,
         add the included relationship names to the primary service's fields.
+
+        For nested includes (e.g., "campaign.advertiser"), only the top-level
+        relationship ("campaign") is added to the primary service's fields.
+
+        Note: The SDK cannot automatically add nested relationships to intermediate
+        resource fieldsets because relationship names don't match entity type names
+        (e.g., "campaign" vs "campaigns"). Users must manually include nested
+        relationship names in intermediate resource fieldsets when using sparse
+        fieldsets.
         """
         if not includes or not fields:
             return fields
@@ -399,11 +408,19 @@ class PlacementsIOClient:
         # Normalize service name (line_items -> line-items)
         service_key = service.replace("_", "-")
 
+        # Extract top-level relationships from nested include paths
+        # e.g., "campaign.advertiser" -> "campaign"
+        top_level_includes = []
+        for include in includes:
+            top_level = include.split(".")[0]
+            if top_level not in top_level_includes:
+                top_level_includes.append(top_level)
+
         if isinstance(fields, list):
             # Fields is a list for primary resource only
             # Add includes that aren't already present
             merged = list(fields)
-            for include in includes:
+            for include in top_level_includes:
                 if include not in merged:
                     merged.append(include)
             return merged
@@ -416,7 +433,7 @@ class PlacementsIOClient:
                 key = service_key if service_key in fields else service
                 merged = dict(fields)
                 merged[key] = list(merged[key])
-                for include in includes:
+                for include in top_level_includes:
                     if include not in merged[key]:
                         merged[key].append(include)
                 return merged

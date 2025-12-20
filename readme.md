@@ -165,9 +165,9 @@ Providing no parameters will return all of the data for that resource; however i
 | Parameter     | Summary                                                                     | Example                                                    |
 | ------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | (filter name) | Resource filters [defined in API](https://api.placements.io/doc/#resources) | `pio.line_items.get(id=1234)`                              |
-| include       | Includes additional data from resource relationships                        | `pio.line_items.get(include=[bill-to-account,advertiser])` |
+| include       | Includes additional data from resource relationships                        | `pio.line_items.get(include=["bill-to-account","advertiser"])` |
 | fields        | Return specified attributes (aka Sparse Fieldsets)                          | `pio.line_items.get(fields=['start-date'])`                |
-| params        | Additional URL parameters                                                   | `pio.line_items.get(params={"stats: True})`                |
+| params        | Additional URL parameters                                                   | `pio.line_items.get(params={"stats": True})`                |
 
 The response from the SDK will be a list of dictionaries, regardless of the number of results that will be returned.
 
@@ -176,19 +176,50 @@ The response from the SDK will be a list of dictionaries, regardless of the numb
 The `fields` parameter limits which attributes are returned. It accepts two formats:
 
 **List format** - applies to the primary resource:
-```python
+```python3
 # Returns only ad-server-id, name and start-date for line-items
-pio.line_items.get(fields=["ad-server-id", "name", "start-date"])
+line_items = await pio.line_items.get(fields=["ad-server-id", "name", "start-date"])
 ```
 
 **Dict format** - specify fields per resource type (useful with `include`):
-```python
+```python3
 # Get line items with campaigns, limiting fields on both
 line_items = await pio.line_items.get(
     include=["campaigns"],
     fields={
         "line-items": ["ad-server-id", "name", "start-date"],
         "campaigns": ["ad-server-id", "end-date"]
+    }
+)
+```
+
+When using sparse fieldsets with `include`, the SDK automatically adds required relationship fields to ensure included data merges correctly. For example:
+```python3
+# The SDK adds "campaigns" to the line-items fieldset automatically
+line_items = await pio.line_items.get(
+    include=["campaigns"],
+    fields=["name", "ad-server-id"]
+)
+```
+
+#### Nested Includes
+
+The API supports nested includes using dot notation (e.g., `campaign.advertiser`). When using nested includes with sparse fieldsets, be aware of the following behavior and limitations for the SDK:
+
+1. The SDK automatically adds the top-level relationship to the primary resource's fieldset (e.g., for `include=["campaign.advertiser"]`, `campaign` is added to the line-items fieldset if required).
+
+2. **Limitation**: The SDK cannot automatically add nested relationships to intermediate resource fieldsets because relationship names don't always match resource type names (e.g., `campaign` vs `campaigns`). You must manually include these.
+
+3. Sparse fieldsets for included resources must use the **resource type name**, not the relationship name.
+
+```python3
+# Example: Get line items with campaign and its advertiser
+line_items = await pio.line_items.get(
+    include=["campaign.advertiser"],
+    fields={
+        "line-items": ["name"],               # SDK adds "campaign" automatically
+        "campaigns": ["name", "advertiser"],  # "advertiser" must be manually specified to merge includes
+        "accounts": ["name"]                  # Use resource type "accounts", not "advertiser"
     }
 )
 ```

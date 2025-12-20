@@ -152,3 +152,86 @@ def test_merge_includes_into_fields_dict_primary_not_specified():
     # Should return unchanged
     assert result == {"accounts": ["custom-fields"]}
     assert "campaigns" not in result
+
+
+# ============================================================================
+# Tests for nested includes in _merge_includes_into_fields
+# ============================================================================
+
+
+def test_merge_includes_nested_extracts_top_level_list():
+    """Test that nested includes extract top-level relationship for list fields."""
+    client = PlacementsIOClient()
+
+    result = client._merge_includes_into_fields(
+        service="line-items",
+        includes=["campaign.advertiser"],
+        fields=["name"]
+    )
+
+    # Should add "campaign" (top-level) not "campaign.advertiser"
+    assert "name" in result
+    assert "campaign" in result
+    assert "campaign.advertiser" not in result
+
+
+def test_merge_includes_nested_extracts_top_level_dict():
+    """Test that nested includes extract top-level relationship for dict fields."""
+    client = PlacementsIOClient()
+
+    result = client._merge_includes_into_fields(
+        service="line-items",
+        includes=["campaign.advertiser"],
+        fields={"line-items": ["name"]}
+    )
+
+    # Should add "campaign" (top-level) not "campaign.advertiser"
+    assert "name" in result["line-items"]
+    assert "campaign" in result["line-items"]
+    assert "campaign.advertiser" not in result["line-items"]
+
+
+def test_merge_includes_deeply_nested():
+    """Test that deeply nested includes (3+ levels) extract top-level only."""
+    client = PlacementsIOClient()
+
+    result = client._merge_includes_into_fields(
+        service="line-items",
+        includes=["campaign.advertiser.contacts"],
+        fields=["name"]
+    )
+
+    # Should only add "campaign" (top-level)
+    assert "campaign" in result
+    assert "advertiser" not in result
+    assert "contacts" not in result
+
+
+def test_merge_includes_mixed_simple_and_nested():
+    """Test mixed simple and nested includes."""
+    client = PlacementsIOClient()
+
+    result = client._merge_includes_into_fields(
+        service="line-items",
+        includes=["product", "campaign.advertiser"],
+        fields=["name"]
+    )
+
+    # Should add both "product" and "campaign"
+    assert "product" in result
+    assert "campaign" in result
+    assert "campaign.advertiser" not in result
+
+
+def test_merge_includes_nested_deduplication():
+    """Test that duplicate top-level includes are deduplicated."""
+    client = PlacementsIOClient()
+
+    result = client._merge_includes_into_fields(
+        service="line-items",
+        includes=["campaign", "campaign.advertiser", "campaign.opportunity"],
+        fields=["name"]
+    )
+
+    # Should only have "campaign" once
+    assert result.count("campaign") == 1

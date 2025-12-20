@@ -368,5 +368,6 @@ async def test_fields_with_include_sends_both_params(mock_get_capture_request):
     request = mock_get_capture_request[0]
     params = dict(request.url.params)
     assert params["include"] == "advertiser"
-    assert params["fields[campaigns]"] == "name"
+    # Include is merged into primary resource's fields to ensure relationship data is returned
+    assert params["fields[campaigns]"] == "name,advertiser"
     assert params["fields[accounts]"] == "custom-fields"
