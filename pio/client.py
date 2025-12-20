@@ -110,6 +110,7 @@ class PlacementsIOClient:
             param.update(self.pagination())
             param.update(self._filter_values(filters))
             param.update(self._list_values("include", includes))
+            fields = self._merge_includes_into_fields(service, includes, fields)
             param.update(self._fields_values(service, fields))
             self.logger.info("Fetching data from %s", service)
             response = await self.client_request(
@@ -378,3 +379,46 @@ class PlacementsIOClient:
             return params
 
         return {}
+
+    def _merge_includes_into_fields(
+        self,
+        service: str,
+        includes: list = None,
+        fields: Union[list, dict] = None,
+    ) -> Union[list, dict, None]:
+        """
+        Merge included relationship names into fields to ensure relationships
+        are returned when using sparse fieldsets.
+
+        If fields is specified for the primary service and includes is specified,
+        add the included relationship names to the primary service's fields.
+        """
+        if not includes or not fields:
+            return fields
+
+        # Normalize service name (line_items -> line-items)
+        service_key = service.replace("_", "-")
+
+        if isinstance(fields, list):
+            # Fields is a list for primary resource only
+            # Add includes that aren't already present
+            merged = list(fields)
+            for include in includes:
+                if include not in merged:
+                    merged.append(include)
+            return merged
+
+        if isinstance(fields, dict):
+            # Fields is a dict keyed by resource type
+            # Only add includes to primary service if it has fields specified
+            if service_key in fields or service in fields:
+                # Get the key used (could be hyphenated or underscored)
+                key = service_key if service_key in fields else service
+                merged = dict(fields)
+                merged[key] = list(merged[key])
+                for include in includes:
+                    if include not in merged[key]:
+                        merged[key].append(include)
+                return merged
+
+        return fields
