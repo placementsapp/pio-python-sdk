@@ -10,6 +10,7 @@ from typing import Union
 import httpx
 from pio.error.api_error import APIError
 from pio.utility.json_encoder import JSONEncoder
+from pio.model.response import APIResponse
 
 
 class PlacementsIOClient:
@@ -98,7 +99,7 @@ class PlacementsIOClient:
         filters: dict = None,
         includes: list = None,
         fields: list = None,
-    ) -> list:
+    ) -> APIResponse:
         """
         Get existing resources within the service
         """
@@ -109,9 +110,8 @@ class PlacementsIOClient:
             param.update(self.pagination())
             param.update(self._filter_values(filters))
             param.update(self._list_values("include", includes))
-            param.update(
-                self._list_values(f"fields[{service.replace('_', '-')}]", fields)
-            )
+            fields = self._merge_includes_into_fields(service, includes, fields)
+            param.update(self._fields_values(service, fields))
             self.logger.info("Fetching data from %s", service)
             response = await self.client_request(
                 client, "get", service, {"params": param}
@@ -121,6 +121,7 @@ class PlacementsIOClient:
             if errors:
                 raise APIError(errors)
             results = data.get("data", [])
+            included = data.get("included", [])
             meta = data.get("meta", {})
             page_count = meta.get("page-count", 0)
             if page_count > 1:
@@ -139,11 +140,11 @@ class PlacementsIOClient:
                 )
             responses = await asyncio.gather(*tasks)
             for response in responses:
-                data = response.json()
-                data = data.get("data", [])
-                results.extend(data)
+                page_data = response.json()
+                results.extend(page_data.get("data", []))
+                included.extend(page_data.get("included", []))
 
-            return results
+            return APIResponse(data=results, included=included, meta=meta)
 
     async def resource(
         self,
@@ -350,3 +351,91 @@ class PlacementsIOClient:
         if relationships:
             params = {key: ",".join(relationships)}
         return params
+
+    def _fields_values(self, service: str, fields: Union[list, dict] = None) -> dict:
+        """
+        Convert fields parameter to JSON:API sparse fieldsets format.
+
+        Args:
+            service: The primary resource type (e.g., "campaigns")
+            fields: Either a list (applies to primary resource) or
+                    dict keyed by resource type
+
+        Returns:
+            Dict of query parameters like {"fields[campaigns]": "name,id"}
+        """
+        if not fields:
+            return {}
+
+        if isinstance(fields, list):
+            key = f"fields[{service.replace('_', '-')}]"
+            return {key: ",".join(fields)}
+
+        if isinstance(fields, dict):
+            params = {}
+            for resource_type, field_list in fields.items():
+                key = f"fields[{resource_type.replace('_', '-')}]"
+                params[key] = ",".join(field_list)
+            return params
+
+        return {}
+
+    def _merge_includes_into_fields(
+        self,
+        service: str,
+        includes: list = None,
+        fields: Union[list, dict] = None,
+    ) -> Union[list, dict, None]:
+        """
+        Merge included relationship names into fields to ensure relationships
+        are returned when using sparse fieldsets.
+
+        If fields is specified for the primary service and includes is specified,
+        add the included relationship names to the primary service's fields.
+
+        For nested includes (e.g., "campaign.advertiser"), only the top-level
+        relationship ("campaign") is added to the primary service's fields.
+
+        Note: The SDK cannot automatically add nested relationships to intermediate
+        resource fieldsets because relationship names don't match entity type names
+        (e.g., "campaign" vs "campaigns"). Users must manually include nested
+        relationship names in intermediate resource fieldsets when using sparse
+        fieldsets.
+        """
+        if not includes or not fields:
+            return fields
+
+        # Normalize service name (line_items -> line-items)
+        service_key = service.replace("_", "-")
+
+        # Extract top-level relationships from nested include paths
+        # e.g., "campaign.advertiser" -> "campaign"
+        top_level_includes = []
+        for include in includes:
+            top_level = include.split(".")[0]
+            if top_level not in top_level_includes:
+                top_level_includes.append(top_level)
+
+        if isinstance(fields, list):
+            # Fields is a list for primary resource only
+            # Add includes that aren't already present
+            merged = list(fields)
+            for include in top_level_includes:
+                if include not in merged:
+                    merged.append(include)
+            return merged
+
+        if isinstance(fields, dict):
+            # Fields is a dict keyed by resource type
+            # Only add includes to primary service if it has fields specified
+            if service_key in fields or service in fields:
+                # Get the key used (could be hyphenated or underscored)
+                key = service_key if service_key in fields else service
+                merged = dict(fields)
+                merged[key] = list(merged[key])
+                for include in top_level_includes:
+                    if include not in merged[key]:
+                        merged[key].append(include)
+                return merged
+
+        return fields

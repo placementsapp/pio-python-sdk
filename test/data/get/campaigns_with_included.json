@@ -1,0 +1,97 @@
+{
+  "data": [
+    {
+      "id": "41",
+      "type": "campaigns",
+      "links": {
+        "self": "https://api.placements.io/v1/campaigns/41"
+      },
+      "attributes": {
+        "name": "Test Campaign 1",
+        "trafficker-info": {
+          "email": "trafficker@example.org"
+        }
+      },
+      "relationships": {
+        "advertiser": {
+          "links": {
+            "self": "https://api.placements.io/v1/campaigns/41/relationships/advertiser",
+            "related": "https://api.placements.io/v1/campaigns/41/advertiser"
+          },
+          "data": {
+            "type": "accounts",
+            "id": "3549"
+          }
+        },
+        "opportunity": {
+          "links": {
+            "self": "https://api.placements.io/v1/campaigns/41/relationships/opportunity",
+            "related": "https://api.placements.io/v1/campaigns/41/opportunity"
+          },
+          "data": {
+            "type": "opportunities",
+            "id": "485396"
+          }
+        },
+        "line-items": {
+          "links": {
+            "self": "https://api.placements.io/v1/campaigns/41/relationships/line-items",
+            "related": "https://api.placements.io/v1/campaigns/41/line-items"
+          },
+          "data": [
+            { "type": "line_items", "id": "101" },
+            { "type": "line_items", "id": "102" }
+          ]
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "id": "3549",
+      "type": "accounts",
+      "attributes": {
+        "name": "Test Advertiser Inc.",
+        "account-type": "advertiser",
+        "external-id": "ADV-001"
+      },
+      "relationships": {}
+    },
+    {
+      "id": "485396",
+      "type": "opportunities",
+      "attributes": {
+        "name": "LaGuardia Inc. - New Product",
+        "stage-name": "Closed Won",
+        "budget": "50000.00"
+      },
+      "relationships": {
+        "account": {
+          "data": { "type": "accounts", "id": "3549" }
+        }
+      }
+    },
+    {
+      "id": "101",
+      "type": "line_items",
+      "attributes": {
+        "name": "Display Banner - Homepage",
+        "rate": "15.00"
+      },
+      "relationships": {}
+    },
+    {
+      "id": "102",
+      "type": "line_items",
+      "attributes": {
+        "name": "Display Banner - Sidebar",
+        "rate": "10.00"
+      },
+      "relationships": {}
+    }
+  ],
+  "meta": {
+    "record-count": 1,
+    "page-count": 1
+  }
+}
