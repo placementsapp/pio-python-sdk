@@ -171,6 +171,33 @@ Providing no parameters will return all of the data for that resource; however i
 
 The response from the SDK will be a list of dictionaries, regardless of the number of results that will be returned.
 
+#### Accessing Included Data
+
+When using the `include` parameter, the SDK automatically merges included resources into their corresponding relationship data:
+
+```python3
+# Without include - relationship data contains only type and id
+campaigns = await pio.campaigns.get(id=123)
+campaign = campaigns[0]
+campaign["relationships"]["advertiser"]["data"]
+# {"type": "accounts", "id": "3549"}
+
+# With include - relationship data contains the full resource
+campaigns = await pio.campaigns.get(id=123, include=["advertiser"])
+campaign = campaigns[0]
+campaign["relationships"]["advertiser"]["data"]
+# {"type": "accounts", "id": "3549", "attributes": {"name": "Test Advertiser", ...}, ...}
+```
+
+This applies to both to-one and to-many relationships, and works recursively for nested includes.
+
+You can also access the raw included resources directly from the response:
+
+```python3
+campaigns = await pio.campaigns.get(id=123, include=["advertiser", "opportunity"])
+campaigns.included  # List of all included resources
+```
+
 #### Sparse Fieldsets
 
 The `fields` parameter limits which attributes are returned. It accepts two formats:
